@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <link rel="stylesheet" type="text/css" href="/style.css"/>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsUA7j-lZ0J3sPtd_Lreq9v4cDnFWfMX0&callback=initMap"></script>
+</head>
+<body>
+  <div class="container">
+    <h1 style="margin-top: 25px;">Weather Information</h1>
+    <form action="/weather" method="get">
+      <input type="text" name="city" placeholder="Enter city name" />
+      <button type="submit">Get Weather</button>
+    </form>
+    
+    <!-- Weather section -->
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } else if (weather) { %>
+      <div class="card">
+        <h2><i class="fas fa-map-marker-alt"></i> <%=weather.name%>, <%=weather.sys.country%></h2>
+        <p><i class="fas fa-map-pin"></i> Coordinates: <%=weather.coord.lat %>, <%= weather.coord.lon %></p>
+        <h3> Temperature: <i class="fas fa-thermometer-half"></i> <%=weather.main.temp%>&deg;C</h3>
+        <p> Feels like: <i class="fas fa-temperature-low"></i> <%=weather.main.feels_like%>&deg;C</p>
+        <p><i class="fas fa-cloud"></i> <%=weather.weather[0].main%>, <%=weather.weather[0].description%></p>
+        <p>Humidity: <%=weather.main.humidity%>%</p>
+        <p>Pressure: <%=weather.main.pressure%>hPa</p>
+        <p><i class="fas fa-wind"></i> Wind speed: <%=weather.wind.speed%> m/s</p>
+        <% if (weather.rain && weather.rain["3h"] !== undefined) { %>
+          <p>Rain (last 3 hours): <%= weather.rain["3h"] %> mm</p>
+        <% } else { %>
+          <p>No rain data available for the last 3 hours</p>
+        <% } %>
+      </div>
+    <% } else if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <!-- Map Section -->
+    <% if (location) { %>
+      <iframe width="100%" height="400" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/view?key=AIzaSyDsUA7j-lZ0J3sPtd_Lreq9v4cDnFWfMX0&center=<%= location.lat %>,<%= location.lng %>&zoom=10" allowfullscreen></iframe>
+    <% } %>
+    
+    <!-- News Section -->
+    <% if (newsData && newsData.articles.length > 0) { %>
+      <h2 style="margin-top: 25px;">Maybe interesting</h2>
+      <div class="row">
+        <% for (let i = 0; i < Math.min(6, newsData.articles.length); i++) { %>
+          <div class="col-md-4">
+            <div class="card mb-4 box-shadow h-90" style="width: 18rem;">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title"><%= newsData.articles[i].title %></h5>
+                <p class="card-text flex-grow-1"><%= newsData.articles[i].description %></p>
+                <a href="<%= newsData.articles[i].url %>" class="btn btn-primary" target="_blank">Read more</a>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    <% } else if (newsData && newsData.articles.length === 0) { %>
+      <h3>No news articles found for the selected location.</h3>
+    <% } %>
+
+  </div>
+
+  <footer class="mainfooter" role
